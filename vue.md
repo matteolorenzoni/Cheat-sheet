@@ -9,7 +9,7 @@
 - [Interpolation](#interpolation)
 - [Refs](#refs)
 - [Component](#component)
-- [Async component](#async-component)
+- [Async component](#async-component)  
 - [Props](#props)
 - [Props validation](#props-validation)
 - [Slot](#slot)
@@ -20,8 +20,13 @@
 - [Events](#events)
 - [Custom events](#custom-events)
 - [Authentication](#authentication)
-- [Auto loggin/logout](#auto-login/logout)
+- [Auto login/logout](#auto-login/logout)
 - [Composition API](#composition-api)
+
+- [Utils](#Utils)
+  - [Use "this" into inner function](#Use-this-into-inner-function)
+  - [Reactive input vs set input](#Reactive-input-vs-set-input)
+
 
 - [Libraries You Should Know](#libraries-you-should-know)
 - [Tips](#tips)
@@ -46,7 +51,7 @@
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Directives
@@ -400,7 +405,7 @@
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Directives(NPM)
@@ -470,7 +475,7 @@ export default {
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Special attributes
@@ -519,7 +524,7 @@ export default {
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Interpolation
@@ -542,10 +547,11 @@ export default {
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Refs
+- It allows to retrieve values from DOM elements when you need them, instead of all the time </br>
 
 ```vue
 <template>
@@ -562,37 +568,17 @@ export default {
   },
   methods: {
     setText(){
-      this.username = this.$refs.
+      this.username = this.$refs.usernameInput.value;
     }
   }
 };
 </script>
 ```
 
-```vue
-<template>
-  <input type="text" ref="usernameInput" />
-  <button @click="setUsername">Set username</button>
-</template>
 
-<script>
-export default {
-  data(){
-    return{
-      username: ''
-    }
-  },
-  methods: {
-    setText(){
-      this.username = this.$refs.
-    }
-  }
-};
-</script>
-```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Component
@@ -758,7 +744,7 @@ app.component("asyncfoowithoptions-component", AsyncFooWithOptions);
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Props
@@ -834,7 +820,7 @@ export default {
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Props validation
@@ -851,7 +837,7 @@ export default {
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Slot
@@ -1072,7 +1058,7 @@ export default {
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Router
@@ -1125,17 +1111,18 @@ router.beforeEach((to, from, next) => {
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Instance options
 
 ```javascript
 export default {
-  component: {}
+  components: {}
+  props: []
   data(){},
   props: {},
-  emits: {},
+  emits: [],
   methods: {},
   computed: {},
   watch: {},
@@ -1157,8 +1144,12 @@ export default {
 };
 ```
 
-```javascript
-// // Components that can be used in the template
+
+<details>
+<summary>components</summary>
+- Components that can be used in the template
+
+```js
 import ProductComponent from "@/components/ProductComponent";
 import ReviewComponent from "@/components/ReviewComponent";
 
@@ -1169,33 +1160,57 @@ export default {
   },
 };
 ```
+</details>  
+
+
+<details>
+<summary>props</summary>
+- Used to pass data to child component
 
 ```javascript
-// component state
-data(){
-  return { ... }
-}
+export default {
+  props: [
+    prop1: {
+      type: [String, Number],
+      required: true,
+      default() {
+        return { message: 'hello' }
+      },
+      validator(value) {
+        return ['success', 'warning', 'danger'].includes(value)   // The value must match one of these strings
+      }
+    },
+    prop2: { ... }
+  ]
+};
 ```
+</details>  
+
+
+<details>
+<summary>data</summary>
+- Component state
 
 ```javascript
-// props used to pass data to child component
-props: {
-  prop1: {
-    type: ...,
-    required: ...,
-    default(){ ... },
-    validator(value){ ... }
+export default {
+  data(){
+    return { ... }
   }
-},
+};
 ```
+</details>  
+
+
+<details>
+<summary>emits</summary>
 
 ```javascript
 // list of custom event from child component
-emits: ['custum-event1', 'custom-event2', ... ]
+emits: ['custom-event1', 'custom-event2', ... ]
 
-// custum-event1 must be to have 2 arguments when is called in child component
+// custom-event1 must be to have 2 arguments when is called in child component
 emits: {
-  'custum-event1': (arg1, arg2) => {
+  'custom-event1': (arg1, arg2) => {
       if (arg1 && arg2) {
         return true
       } else {
@@ -1206,67 +1221,138 @@ emits: {
   }
 }
 ```
+</details>  
+
+
+<details>
+<summary>methods</summary>
+- Generic functions </br>
+- Used for all function thats must re-evaluated every time (every render of the component) </br>
+
 
 ```javascript
-// generic functions
-// used with event binding or data binding
-methods: {
-  functionName($event, arg1, arg2, ...){ ... }
-},
-```
-
-```javascript
-// function that return a value
-// used with data binding
-computed: {
-  functionName(){
-    return ...
-  },
-  functionName(){
-    return (arg1, ...) => `${arg1} a tutti`;
+export default {
+  methods: {
+    functionName($event, arg1, arg2, ...){ ... }
   }
-},
+};
 ```
 
+Uses in template (event binding and data binding)
+```vue
+<template>
+  <button @click="functionName(10, 'text')">Add to Cart</button>
+</template>
+```
+
+```vue
+<template>
+  <div> {{ functionName(10, 'text') }}
+</template>
+```
+</details>
+
+
+<details>
+<summary>computed</summary>
+- Function that return a value </br>
+- Used for all function thats must re-evaluated when a inner data value changes </br>
+- Used instead of watch when the function is associated to two or more values (with only one is better use the "watch") </br>
+
 ```javascript
-// void function
-// used to executes some operations, not directluy in template
-watch: {
-  functionName(newValue, oldValue){
-    // ...
+export default {
+  computed: {
+    functionName(){
+      // ...
+      return ...
+    },
+    functionName(){
+      return (arg1, ...) => `${arg1} a tutti`;
+    }
   }
-}
+};
 ```
 
-```javascript
-beforeCreate: {}, // ----
-created: {}, // used to insert data SAVED IN APP that you want display from the first render
-beforeMount: {}, // ----
-mounted: {}, // used to insert FETCH data that you want display (from first render o subsequent)
-beforeUpdate: {}, // ----
-updated: {}, // ----
-beforeDestroy: {}, // ----
-destroyed: {}, // ----
-beforeUnmount: {}, // ----
-unmounted: {}, // ----
-activated: {}, // execute when the component is under control of the keep-alive
-deactivated: {}, // execute when the component is under control of the keep-alive and it is disactivated
+Uses in template (data binding)
+```vue
+<template>
+  <div>{{ functionName }}</div>
+</template>
 ```
+</details>  
+
+
+<details>
+<summary>watch</summary>
+- Void function </br>
+- Must be the same name of a data </br>
+- Used when the function doesn't change a data (so there are a initial controllers on value) </br>
+- Used when the function have to do different option depends on the value (so there are a initial controllers on value) </br>
+- Used to executes some operations, not directly in template </br>
+- It is called automatically when the relative data changing</br>
 
 ```javascript
-errorCaptured(err, component, details){ ... }, //execute when an error of child component is triggered (render function, wath function, hooks, event handler)
-renderTracked({ key, target, type }){ ... } , // This event tells you what operation tracked the component and the target object and key of that operation.
-renderTriggered({ key, target, type }){ ... }, // This event tells you what operation triggered the re-rendering and the target object and key of that operation
+export default {
+  watch: {
+    functionName(newValue, oldValue){
+      if (newValue > 50){
+        this.counter = 0;
+      }
+    }
+  }
+};
 ```
+
+Uses in template (none)
+```markdown
+not use in the template
+```
+
+
+</details>
+
+<details>
+<summary>lifecycle hooks</summary>
+
+```javascript
+export default {
+  beforeCreate: {},
+  created: {}, // used to insert data SAVED IN APP that you want display from the first render
+  beforeMount: {}, 
+  mounted: {}, // used to insert FETCH data that you want display (from first render o subsequent)
+  beforeUpdate: {},
+  updated: {}, 
+  beforeDestroy: {}, 
+  destroyed: {}, 
+  beforeUnmount: {}, 
+  unmounted: {}, 
+  activated: {}, // execute when the component is under control of the keep-alive
+  deactivated: {}, // execute when the component is under control of the keep-alive and it is deactivated
+};
+```
+</details>
+
+<details>
+<summary>other options</summary>
+
+```javascript
+export default {
+  errorCaptured(err, component, details){ ... }, //execute when an error of child component is triggered (render function, what function, hooks, event handler)
+  renderTracked({ key, target, type }){ ... } , // This event tells you what operation tracked the component and the target object and key of that operation.
+  renderTriggered({ key, target, type }){ ... }, // This event tells you what operation triggered the re-rendering and the target object and key of that operation
+};
+```
+</details>  
+
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Vue router (router options)
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Vuex (store & module options)
@@ -1466,7 +1552,7 @@ export default {
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Events
@@ -1529,7 +1615,7 @@ Mouse modifiers:
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Custom events
@@ -1598,7 +1684,7 @@ emits: {
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Authentication
@@ -1615,7 +1701,7 @@ emits: {
 - (For logout in firebase is sufficient to reset the global state)
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Auto login/logout
@@ -1746,7 +1832,7 @@ export default {
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Composition API
@@ -2195,12 +2281,101 @@ export default {
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br></br></br> <!----------------------------------------------->
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 <!------------------------------------------------------------------------------------------------------------------>
+
+## Utils
+#### Use this into inner function
+```javascript
+export default {
+  watch: {
+    functionName(newValue, oldValue){
+      if (newValue > 50){
+        const that = this;
+        setTimeout(function() {
+          that.counter = 0;
+        }, 2000);
+      }
+    }
+  }
+};
+```
+
+
+
+#### Reactive input vs set input
+Reactive input
+```vue
+<template>
+  <input type="text" v-model="message">
+  <p>{{ message }}</p>
+</template>
+
+<script>
+  export default {
+    data(){
+      message: ''
+    }
+  };
+</script>
+```
+
+```vue
+<template>
+  <input type="text" ref="usernameInput" />
+  <button @click="setUsername">Set username</button>
+</template>
+
+<script>
+export default {
+  data(){
+    return{
+      username: ''
+    }
+  },
+  methods: {
+    setText(){
+      this.username = this.$refs.usernameInput.value;
+    }
+  }
+};
+</script>
+```
+
+Set input
+```vue
+<template>
+  <input type="text" @input"saveInput">
+  <button @click="setText">Set text</button>
+  <p>{{ message }}</p>
+</template>
+
+<script>
+  export default {
+    data(){
+      inputValue: '',
+      message: ''
+    }
+    methods: {
+      saveInput(event){
+        this.inputValue = event.target.value
+      },
+      setText(){
+        this.message = this.inputValue
+      }
+    }
+  };
+</script>
+```
+
+
+
+
+
+
 <!------------------------------------------------------------------------------------------------------------------>
-<!------------------------------------------------------------------------------------------------------------------>
-<!------------------------------------------------------------------------------------------------------------------>
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 <!------------------------------------------------------------------------------------------------------------------>
 
@@ -2264,7 +2439,7 @@ export default {
     },
   },
 };
-</script>
+</>
 ```
 
 ### 2. Learn and use Vuex from the start
