@@ -1,8 +1,9 @@
 # PWA
 
 - [Intro](#Intro)
-- [AMP](#AMP-(Accelerated-Mobile-Page))
 - [Funzionalità](#Funzionalità)
+- [Sito whatwebcando](#Sito-whatwebcand)
+- [AMP](#AMP-(Accelerated-Mobile-Page))
 
 
 ## Intro
@@ -12,15 +13,6 @@
 - Il termine “progressive” si riferisce al fatto che introducono nuove feature. La PWA mette a disposizione una serie di features aggiuntive rispetto a un normale sito, rese disponibili dall’uso del **Service Worker**, uno script che si trova tra il server e il browser, aggiungendo un nuovo livello di funzionalità background.
 - Dal punto di vista dell’esperienza utente inizialmente sono percepite come normali siti web ma progressivamente si comportano sempre più come app mobili
 - Sono multi piattaforma
-
-
-
-
-
-
-## AMP (Accelerated Mobile Page)
-- Le PWA usano le AMP
-- Le pagine AMP non sono altro che pagine composte dagli stessi elementi di tutte le pagine tradizionali, ma che rispettano alcune restrizioni date dall’uso di regole di sviluppo e tags specifici. In buona sostanza, vengono eliminati tutti quegli elementi che “rallentano” il sito, permettendo un notevole abbattimento del peso di una pagina e del suo tempo di caricamento. 
 
 
 
@@ -41,3 +33,23 @@
 - **Responsive**: si adattano alle varie dimensioni dello schermo: desktop, mobile, tablet, o dimensioni che potranno in seguito rendersi disponibili.
 - **Sicure**: vengono esposte su protocollo HTTPS per evitare che la connessione esponga informazioni o che i contenuti vengano alterati.
 - **Aggiornate**: le informazioni sono sempre aggiornate grazie al processo di aggiornamento dei dati offerto dai service worker.
+
+
+<!------------------------------------------------------------------------------------------------------------------>
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------>
+
+## Sito whatwebcando
+<a href="https://whatwebcando.today/">Link</a>
+
+
+
+<!------------------------------------------------------------------------------------------------------------------>
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------>
+
+
+
+## AMP (Accelerated Mobile Page)
+- Le PWA usano le AMP
+- Le pagine AMP non sono altro che pagine composte dagli stessi elementi di tutte le pagine tradizionali, ma che rispettano alcune restrizioni date dall’uso di regole di sviluppo e tags specifici. In buona sostanza, vengono eliminati tutti quegli elementi che “rallentano” il sito, permettendo un notevole abbattimento del peso di una pagina e del suo tempo di caricamento. 
