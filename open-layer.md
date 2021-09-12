@@ -1,19 +1,22 @@
 # Index
 
-- [Map elements](#Map-elements)
+- [Key concept](#Key-concept)
 - [View](#View)
 - [Layer](#Layer)
 - [Overlay](#Overlay)
+- [Interaction](#Interaction)
 
 
-- [Roster data](#Roster-data)
 
 
-## Map Elements
 
-- **View**: defines the area where the map will initially displayed, the zoom, the center
-- **Layers**: image that you want to see in your map
-- **Target Container**: id of the div element to inject the map
+## Key concept
+
+- **View**: represents a simple 2D view of the map. This is the object to act upon to change the center, resolution, and rotation of the map.
+- **Layers**: base class from which all layer types are derived
+- **Overlay**: an element to be displayed over the map and attached to a single map location.
+- **Interaction**: allow to interact with the map thanks user actions that change the state of the map (similar to controls, but are not associated with a DOM element)
+- **Controls**: allow to interact with the map thanks to ui widget
 
 ```javascript
 import { Map, View } from "ol";
@@ -38,7 +41,12 @@ function init() {
 }
 ```
 
+<!------------------------------------------------------------------------------------------------------------------>
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------>
+
 ## View
+- Defines the area where the map will initially displayed, the zoom, the center ecc.. </br>
 ```javascript
 var view = new View({
   center: [0, 0],
@@ -50,20 +58,16 @@ var view = new View({
 });
 ```
 
+<!------------------------------------------------------------------------------------------------------------------>
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------>
+
 ## Layer
-A layer provides access to source of geospatial data and then we can visualize them (roster data and vector data)
-- roster data: refers to digital image (es: satellite images). This type of data is excellent for visualization of continuos data like elevation or temperature
-- vector data: refers to geometric shapes such as points, lines and polygons
+- A layer provides access to source of geospatial data and then we can visualize them (roster data and vector data)
+  - roster data: refers to digital image (es: satellite images). This type of data is excellent for visualization of continuos data like elevation or temperature
+  - vector data: refers to geometric shapes such as points, lines and polygons
 
 **Hierarchy**
-- ol/layer/Base~BaseLayer
-  - ol/layer/Group~LayerGroup
-    - ol/layer/Base~BaseLayer
-  - ol/layer/Layer~Layer
-    - ol/layer/BaseImage~BaseImageLayer (Server-rendered images that are available for arbitrary extents and resolutions)
-    - ol/layer/BaseTile~BaseTileLayer (For layer sources that provide pre-rendered, tiled images in grids that are organized by zoom levels for specific resolutions)
-    - ol/layer/BaseVector~BaseVectorLayer (Vector data that is rendered client-side)
-
 - import BaseLayer from 'ol/layer/Base';
   - import LayerGroup from 'ol/layer/Group';
     - import BaseLayer from 'ol/layer/Base';
@@ -73,9 +77,19 @@ A layer provides access to source of geospatial data and then we can visualize t
     - import BaseVectorLayer from 'ol/layer/BaseVector';
 
 
-## Overlay
-A overlay is used to visualization of geospatial data in a specific location of the map
+<!------------------------------------------------------------------------------------------------------------------>
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------>
 
+## Overlay
+An element to be displayed over the map and attached to a single map location </br>
+A overlay is used to visualization of geospatial data in a specific location of the map
+```html
+<div id='popup-container'>
+  <div id='popup-coordinates'></div>
+</div>
+<div id='js-map'></div>
+```
 ```javascript
 const popupContainerElement = document.getElementById("popup-coordinates")
 const popup = new Overlay({
@@ -93,5 +107,73 @@ map.on("click", function(e){
 })
 ```
 
-## Roster data
-- Tile: if you zoom in, provide you more details
+
+<!------------------------------------------------------------------------------------------------------------------>
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------>
+
+## Interaction
+- Define interaction </br>
+- Define condition (optional) </br>
+- Define fires event (it's the event that occurs when the interaction is finished) </br>
+
+#### active keyboard
+```javascript
+function init() {
+  const map = new Map({
+    keyboardEventTarget: document
+  });
+}
+```
+
+#### Interaction
+Superclass for interactions class </br>
+```javascript
+import { ... } from 'ol/interaction';
+```
+
+#### DragRotate (it's an example)
+```javascript
+const dragRotateInteraction = new DragRotate({
+  condition: ol.events.condition.altKeyOnly ;
+})
+
+map.addInteraction(dragRotateInteraction)
+```
+
+#### Draw (it's an example)
+```javascript
+const drawInteraction = new Draw({
+  condition: ol.events.condition.altKeyOnly ;
+})
+
+map.addInteraction(dragRotateInteraction)
+
+drawInteraction.on('drawend', function(e){
+  let parser = new GeoJSON();
+  // let drawnFeatures = parser.writeFeatures([e.feature]);
+  let drawnFeatures = parser.writeFeaturesObject([e.feature]);
+  console.log(drawnFeatures);
+})
+```
+
+<!------------------------------------------------------------------------------------------------------------------>
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------>
+
+## Controls
+
+#### add controls (besides the default controls)
+```javascript
+function init() {
+  const fullScreenControl = new FullScreen();
+  const mousePositionControl = new MousePosition();
+
+  const map = new Map({
+    controls: ol.control.defaults().extend([
+      fullScreenControl,
+       mousePositionControl
+    ])
+  });
+}
+```

@@ -1,7 +1,6 @@
 # Vue Cheatsheet
 
 # Table of Contents
-
 - [Expressions](#expressions)
 - [Directives](#directives)
 - [Directives (NPM)](<#directives(NPM)>)
@@ -22,10 +21,15 @@
 - [Authentication](#authentication)
 - [Auto login/logout](#auto-login/logout)
 - [Composition API](#composition-api)
-
 - [Utils](#Utils)
   - [Use "this" into inner function](#Use-this-into-inner-function)
   - [Reactive input vs set input](#Reactive-input-vs-set-input)
+
+- [PWA](#PWA)
+- [Node-Sass vs Dart-Sass](#Node-Sass-or-Dart-Sass)
+
+
+
 
 
 - [Libraries You Should Know](#libraries-you-should-know)
@@ -2283,7 +2287,6 @@ export default {
 <!------------------------------------------------------------------------------------------------------------------>
 <!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
-<!------------------------------------------------------------------------------------------------------------------>
 
 ## Utils
 #### Use this into inner function
@@ -2371,12 +2374,21 @@ Set input
 
 
 
+<!------------------------------------------------------------------------------------------------------------------>
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------>
+
+## Node-Sass or Dart-Sass
+- Ther are two type of Sass preprocessor implementation
+- CSS preprocessor: is a program that lets you generate CSS from the preprocessor's own unique syntax. It adds some A CSS preprocessor is a program that lets you generate CSS from the preprocessor's own unique syntax.
+- **Dart-Sass**: is the primary implementation of Sass, which means it gets new features before any other implementation. It’s fast, easy to install, and it compiles to pure JavaScript which makes it easy to integrate into modern web development workflows.
+- **Node-Sass**: is just a wrapper over LibSass (the C implemented version of Sass).
+
 
 
 
 <!------------------------------------------------------------------------------------------------------------------>
 <!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
-<!------------------------------------------------------------------------------------------------------------------>
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Libraries you should know
