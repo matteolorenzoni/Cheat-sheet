@@ -6,11 +6,12 @@
 - [Directives (NPM)](<#directives(NPM)>)
 - [Special attributes](#special-attributes)
 - [Interpolation](#interpolation)
-- [Refs](#refs)
+- [Vue object](#Vue-object)
 - [Component](#component)
 - [Async component](#async-component)  
 - [Props](#props)
-- [Props validation](#props-validation)
+- [Emit custom events](#Emit-custom-events)
+- [Provide & inject](#Provide-&-inject)
 - [Slot](#slot)
 - [Router](#router)
 - [Instance options](#instance-options)
@@ -553,13 +554,22 @@ export default {
 <!------------------------------------------------------------------------------------------------------------------>
 <!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
+## Vue object
+- [$refs](#$refs)
+- [$events](#$events)
+- [$emits()](#$emits())
 
-## Refs
+
+
+
+#### $refs
+- It's an object of DOM elements and component instances, registered with ref attributes. </br>
 - It allows to retrieve values from DOM elements when you need them, instead of all the time </br>
-
 ```vue
+/* FUNCTION WITH NO PARAMETERS*/
+/* NO NEED $EVENT */
 <template>
-  <input type="text" ref="usernameInput" />
+  <input type="text" @input="setName"/>
   <button @click="setUsername">Set username</button>
 </template>
 
@@ -567,12 +577,38 @@ export default {
 export default {
   data(){
     return{
-      username: ''
+      name: ''
     }
   },
   methods: {
-    setText(){
-      this.username = this.$refs.usernameInput.value;
+    setName(event){
+      this.username = event.target.value;
+    }
+  }
+};
+</script>
+```
+
+#### $events
+- It allows to pass the events to the function as a parameter (an object) </br>
+```vue
+/* FUNCTION WITH PARAMETERs*/
+/* NEED $EVENT */
+<template>
+  <input type="text" @input="setName($events, "Dr. ")"/>
+  <button @click="setUsername">Set username</button>
+</template>
+
+<script>
+export default {
+  data(){
+    return{
+      name: ''
+    }
+  },
+  methods: {
+    setName(event, secondParameter){
+      this.username = secondParameter + event.target.value;
     }
   }
 };
@@ -580,21 +616,55 @@ export default {
 ```
 
 
+#### $emits()
+- It allows to generate a custom event (used to child -> parent communication) </br>
+```vue
+<template>
+  <button @click="toggleFavorite" ></button>
+</template>
+
+<script>
+export default {
+  data(){
+    return {
+      day: 'monday'
+    };
+  }
+  methods:{
+    toggleFavorite(){
+      this.$emits('toggle-favorite-event', day, 34, 'hello');
+    }
+  }
+};
+</script>
+```
+
 
 <!------------------------------------------------------------------------------------------------------------------>
 <!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Component
-
+- [Register component](#Register-component)
 - [Import component](#Import-component)
 - [Dynamic component](#Dynamic-component)
 - [Keep alive dynamic component](#Keep-alive-dynamic-component)
 - [Teleport](#Teleport)
 - [Async component](#Async-component)
 
-#### Import component
+#### Register component
+```js
+import App from './App.vue';
+import ProductComponent from './components/ProductComponent';
 
+const app = createApp(app);
+
+app.component('product-component', ProductComponent);
+
+app.mount("#app");
+```
+
+#### Import component
 ```vue
 <template>
   <div>
@@ -752,45 +822,109 @@ app.component("asyncfoowithoptions-component", AsyncFooWithOptions);
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Props
+- [Type of communication in a component](#Type-of-communication-in-a-component)
+- [Pass props](#Pass-props)
+- [Use props in a template](#Use-props-in-a-template)
+- [Examples of passing props](#Examples-of-passing-props)
+- [Props validation](#Props-validation)
 
-```html
-<blog-post title="My journey with Vue"></blog-post>
+
+
+#### Type of communication in a component
+```markdown
+TOP - DOWN
+Unidirectional flow: Parent ==(props)=> Child
+Props are immutable: you cannot modify a props value in a child component
 ```
 
-```html
-<!-- Dynamically assign the value of a variable -->
-<blog-post :title="post.title"></blog-post>
+
+
+#### Pass props
+```vue
+<template>
+  <component-child name="Manuel" surname="Lorenz"/>
+</template>
+
+<script>
+export default {
+  props: [
+    name,
+    surname
+  ]
+};
+</script>
 ```
 
-```html
-<!-- Dynamically assign the value of a complex expression -->
-<blog-post :title="post.title + ' by ' + post.author.name"></blog-post>
+
+#### Use props in a template
+```vue
+<template>
+  <div>My name is {{ name }} {{ surname }}</div>
+</template>
+
+<script>
+export default {
+  props: [
+    name,
+    surname
+  ]
+};
+</script>
 ```
 
-```html
-<!-- Passing a Number -->
-<blog-post :likes="42"></blog-post>
-```
 
-```html
-<!-- Passing a Boolean -->
-<blog-post :is-published="false"></blog-post>
-```
-
-```html
-<!-- Passing a Array -->
-<blog-post :comment-ids="[234, 266, 273]"></blog-post>
-```
-
-```html
-<!-- Passing a Object -->
-<blog-post :author="{ name: John, age: 23 }"></blog-post>
+#### Examples of passing props
+```vue
+<template>
+  <blog-post title="My journey with Vue" />
+</template>
 ```
 
 ```vue
 <template>
-  <!-- are equivalent -->
-  <blog-post v-bind="post"></blog-post>
+  <blog-post :title="post.title" />
+</template>
+```
+
+```vue
+<!-- Dynamically assign the value of a complex expression -->
+<template>
+  <blog-post :title="post.title + ' by ' + post.author.name" />
+</template>
+```
+
+```vue
+<!-- Passing a Number -->
+<template>
+  <blog-post :likes="42" />
+</template>
+```
+
+```vue
+<!-- Passing a Boolean -->
+<template>
+  <blog-post :is-published="false" />
+</template>
+```
+
+```vue
+<!-- Passing a Array -->
+<template>
+  <blog-post :comment-ids="[234, 266, 273]" />
+</template>
+```
+
+```vue
+<!-- Passing a Object -->
+<template>
+  <blog-post :author="{ name: John, age: 23 }" />
+</template>
+```
+
+```vue
+<!-- are equivalent -->
+<template>
+  <blog-post v-bind:post="post"></blog-post>
   <blog-post v-bind:id="post.id" v-bind:title="post.title"></blog-post>
 </template>
 
@@ -805,39 +939,238 @@ export default {
 </script>
 ```
 
-```vue
-<template>
-  <blog-post :title="post.title"></blog-post>
-</template>
+#### Props validation
 
-<!------------------------------------------>
-
-<template>
-  <div>Prova +</div>
-</template>
-
-<script>
+```javascript
 export default {
-  props: ["title"],
+  props: [
+    name: {
+      type: [String, Number, Boolean, Array, Object, Date, Function, Symbol, CustomType],
+      required: true,
+      default() {
+        return { 
+          message: 'hello',
+          day: 'monday'
+        }
+      },
+      validator(value) {
+        return ['success', 'warning', 'danger'].includes(value)   // The value must match one of these strings
+      }
+    },
+    prop2: { ... }
+  ]
 };
-</script>
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
 <!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
-## Props validation
+## Emit custom events
+- [Type of communication in a component](#Type-of-communication-in-a-component)
+- [Generate custom event](#Generate-custom-event)
+- [React custom event](#React-custom-event)
+- [Validation custom event](#Validation-custom-event)
 
-```javascript
+
+
+
+
+#### Type of communication in a component
+```markdown
+BOTTOM - UP
+Unidirectional flow: Parent <=(event)== Child
+The children emit an event that the parent can listener and react it
+```
+
+
+#### Generate custom event
+```vue
+<template>
+  <div>Today is {{ day }}</div>
+  <button @click="toggleFavoriteEmitEvent" ></button>
+</template>
+
+<script>
 export default {
-  props: {
-    type: String
-    required: true,
-    default(){ return 'Default name' },
-    validator(value){ return ['success', 'warning', 'danger'].includes(value) }
-  },
+  data(){
+    return {
+      day: 'monday'
+    };
+  }
+  methods:{
+    toggleFavoriteEmitEvent(){
+      this.$emits('toggle-favorite-event', this.day, 34, 'hello');
+    }
+  }
 };
+</script>
+```
+
+#### React custom event
+```vue
+<template>
+  <child-component
+    :day="day"
+    :age="age"
+    :message="message"
+    @toggle-favorite-event="toggleFavoriteCatchEvent"
+  ></child-component>
+</template>
+
+<script>
+export default {
+  data(){
+    return {
+      day: '',
+      age: 0,
+      message: ''
+    };
+  }
+  methods:{
+    toggleFavoriteCatchEvent(day, age, message){
+      this.day = day;
+      this.age = age;
+      this.message = message;
+    }
+  }
+};
+</script>
+```
+
+
+#### Validation custom event
+```vue
+<script>
+export default {
+  emits: [
+    'toggle-favorite-event'
+  ]
+};
+</script>
+```
+```vue
+<!-- parameters + validator --> 
+<script>
+export default {
+  emits: {
+    'toggle-favorite-event': function(day, age, message){
+      if (day, age, message){
+        return true;
+      } else {
+        console.warn('Id is missing');
+        return false;
+      }
+    }
+  }
+};
+</script>
+```
+
+
+<!------------------------------------------------------------------------------------------------------------------>
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------>
+
+## Provide & inject
+- [Why use them](#Why-use-them)
+- [Where use them](#Where-use-them)
+- [How to use them passing props](#How-to-use-them-passing-props)
+- [How to use them passing events](#How-to-use-them-passing-events)
+
+
+
+
+#### Why use them
+```markdown
+In this way we avoid the prop passing or the custom emit throw a component that doesn't handle them
+```
+```markdown
+Provide: besides props
+```
+```markdown
+Inject: in child
+```
+
+
+#### Why use them
+```markdown
+You can use them only if provide is used in a parent component and inject in a child component. They can't be used from two component on the same level
+```
+
+
+#### Provide
+```markdown
+Parent ==(props)=> Child
+```
+```vue
+<!-- PARENT --> 
+<script>
+export default {
+  data(){
+    return{
+      message: "hello"
+    }
+  }
+  provide(){
+    return{
+      message: this.message
+    }
+  }
+};
+</script>
+```
+```vue
+<!-- CHILD --> 
+<template>
+  <div>This is the message: {{ message }}</div>
+</template>
+<script>
+export default {
+  inject: [message]
+};
+</script>
+```
+
+
+#### How to use them passing events
+```markdown
+Parent ==(function)=> Child
+```
+```vue
+<!-- PARENT --> 
+<script>
+export default {
+  data(){
+    return{
+      message: "hello"
+    }
+  }
+  provide(){
+    return{
+      message: this.message,
+      setMessage: this.setMessage
+    }
+  },
+  methods(){
+    setMessage(newMessage){
+      this.message = newMessage
+    }
+  }
+};
+</script>
+```
+```vue
+<!-- CHILD --> 
+<template>
+  <div>This is the message: {{ message }}</div>
+  <button @click"setMessage('reset')"></button>
+</template>
+<script>
+export default {
+  inject: [message, setMessage]
+};
+</script>
 ```
 
 <!------------------------------------------------------------------------------------------------------------------>
@@ -950,7 +1283,7 @@ export default {
 </div>
 ```
 
-#### Remove slot dinamically (if content is not provied)
+#### Remove slot dynamically (if content is not provied)
 
 ```vue
 <!-- child -->
