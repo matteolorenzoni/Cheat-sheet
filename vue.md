@@ -645,14 +645,17 @@ export default {
 <!------------------------------------------------------------------------------------------------------------------>
 
 ## Component
-- [Register component](#Register-component)
-- [Import component](#Import-component)
-- [Dynamic component](#Dynamic-component)
-- [Keep alive dynamic component](#Keep-alive-dynamic-component)
+- [Register global component](#Register-global-component)
+- [Register local component](#Register-global-component)
+- [(Almost) Dynamic component](#(Almost)-Dynamic-component)
+- [Dynamic component (tag: component)](#Dynamic-component-(tag:-component))
+- [Keep alive dynamic component (tag: keep-alive)](#Keep-alive-dynamic-component-(tag:-keep-alive))
 - [Teleport](#Teleport)
 - [Async component](#Async-component)
 
-#### Register component
+#### Register global component
+- Vue have to download all global component at its load so, if there are a lot of components to load, it may be required time
+- You can use it everywhere in the code 
 ```js
 import App from './App.vue';
 import ProductComponent from './components/ProductComponent';
@@ -664,11 +667,14 @@ app.component('product-component', ProductComponent);
 app.mount("#app");
 ```
 
-#### Import component
+#### Register global component
+- You can use it everywhere in the code where they were registered
 ```vue
 <template>
   <div>
-    <ProductComponent></ProductComponent>
+    <product-component></product-component>
+    <ProductComponent1 />
+    <ProductComponent2  />
   </div>
 </template>
 
@@ -676,17 +682,22 @@ app.mount("#app");
 import ProductComponent from @/components/ProductComponent
 
 export default {
-  components: { ProductComponent }
+  components: {
+    'product-component': ProductComponent,
+    ProductComponent1: ProductComponent1, 
+    ProductComponent2
+  }
 };
 </script>
 ```
 
-#### Dynamic component
+#### (Almost) Dynamic component
 
 ```vue
 <!-- child: active-goals -->
 <template>
   <h2>Active Goals</h2>
+  <input type="text" />
 </template>
 ```
 
@@ -698,14 +709,13 @@ export default {
 ```
 
 ```vue
-<!----------------- OPTIMIZED VERSION ----------------------->
 <!-- parent -->
 <template>
   <div>
-    <button v-if="componentSelected === 'active-goals'">Active</button>
-    <button v-if="componentSelected === 'manage-goals'">Manage</button>
-    <active-goals @click="setComponentSelected('active-goals')"></active-goals>
-    <manage-goals @click="setComponentSelected('manage-goals')"></manage-goals>
+    <button @click="setComponentSelected('active-goals')">Active</button>
+    <button @click="setComponentSelected('manage-goals')">Manage</button>
+    <active-goals v-if="componentSelected === 'active-goals'"></active-goals>
+    <manage-goals v-if="componentSelected === 'manage-goals'"></manage-goals>
   </div>
 </template>
 
@@ -723,6 +733,23 @@ export default {
   },
 };
 </script>
+```
+
+#### Dynamic component (tag: component)
+
+```vue
+<!-- child: active-goals -->
+<template>
+  <h2>Active Goals</h2>
+  <input type="text" />
+</template>
+```
+
+```vue
+<!-- child: manage-goals -->
+<template>
+  <h2>Manage Goals</h2>
+</template>
 ```
 
 ```vue
@@ -752,7 +779,22 @@ export default {
 </script>
 ```
 
-#### Keep alive dynamic component
+#### Keep alive dynamic component (tag: keep-alive)
+
+```vue
+<!-- child: active-goals -->
+<template>
+  <h2>Active Goals</h2>
+  <input type="text" />
+</template>
+```
+
+```vue
+<!-- child: manage-goals -->
+<template>
+  <h2>Manage Goals</h2>
+</template>
+```
 
 ```vue
 <!-- parent -->
