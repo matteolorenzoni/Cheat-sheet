@@ -1678,17 +1678,34 @@ export default {
 
 
 ## Router
+- [Full navigation resolution flow](#Full-navigation-resolution-flow)
 - [Route object](#Route-object)
 - [Route object options](#Route-object-options)
 - [Router object options](#Router-object-options)
 - [Router Instance Properties](#Router-Instance-Properties)
 - [Router Instance Methods](#Router-Instance-Methods)
+- [Navigation guards](#Navigation-guards)
 - [Routing setup (register router)](#Routing-setup-(register-router))
 - [Rendering route (tag: router-view)](#Rendering-route-(tag:-router-view))
 - [Change url (tag: router-link)](#Change-url-(tag:-router-link))
 - [Styling active links](#Styling-active-links)
 - [Dynamic route that catches the next url destintion from the query params](#Dynamic-route-that-catches-the-next-url-destintion-from-the-query-params)
 - [Route guard (avoid the url access from the url bar for destination in witch is needed authentication)](#Route-guard-(avoid-the-url-access-from-the-url-bar-for-destination-in-witch-is-needed-authentication))
+
+
+#### Full navigation resolution flow
+- Navigation triggered
+- Call *beforeRouteLeave* guards in deactivated components
+- Call global *beforeEach* guards
+- Call *beforeRouteUpdate* guards in reused components
+- Call *beforeEnter* in route configs
+- Resolve async route components
+- Call *beforeRouteEnter* in activated components
+- Call global *beforeResolve* guards
+- **Navigation confirmed**
+- Call global afterEach hooks
+- DOM updates triggered
+- Call callbacks passed to *next* in *beforeRouteEnter* guards with instantiated instances
 
 #### Route object
 A route object represents the state of the current active route. </br>
@@ -1792,6 +1809,64 @@ router.addRoute(route: RouteConfig)
 router.getRoutes()
 ```
 
+</br></br>
+
+#### Navigation guards
+**Use for:**
+```markdown
+- redirecting
+- canceling
+```
+</br>
+
+**Type of navigation guards**
+```markdown
+- globally
+- per-route
+- in-component
+```
+</br>
+
+**Params or query changes won't trigger enter/leave navigation guards. So you can**
+```markdown
+- watch the $route object to react to those changes
+- use the beforeRouteUpdate in-component guard
+```
+</br>
+
+**In-component guards**
+```markdown
+- beforeRouteEnter(to, from, next)
+- beforeRouteUpdate(to, from, next)
+- beforeRouteLeave(to, from, next)
+```
+```vue
+<script>
+  export default {
+    // NOT have access to `this` directly, only in callback passed to next()
+    beforeRouteEnter(to, from, next) {
+      next(vm => { /* access to component instance via `vm` */ })
+    }
+
+    // have access to `this`
+    beforeRouteUpdate(to, from, next) {
+      this.name = to.params.name
+      next()
+    }
+
+    // have access to `this`   
+    beforeRouteLeave(to, from, next) {
+      const answer = window.confirm('Do you really want to leave? you have unsaved changes!')
+      if (answer) {
+        next()
+      } else {
+        next(false)
+      }
+    }
+  }
+</script>
+```
+</br>
 
 Global before guards (Navigation Guards)
 ```js
@@ -2145,7 +2220,7 @@ export default {
     },
   },
 };
-</script>
+</>
 ```
 
 ```javascript
