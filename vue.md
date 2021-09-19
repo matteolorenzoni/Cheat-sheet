@@ -13,8 +13,8 @@
 - [Emit custom events](#Emit-custom-events)
 - [Provide & inject](#Provide-&-inject)
 - [Slot](#slot)
-- [Router](#router)
 - [Instance options](#instance-options)
+- [Router](#router)
 - [Vue router (router options)](#vue-router-options)
 - [Vuex (store & module options)](#vuex-store-&-module-options)
 - [Events](#events)
@@ -658,6 +658,7 @@ export default {
 - You can use it everywhere in the code 
 ```js
 import App from './App.vue';
+import { createApp } from 'vue';
 import ProductComponent from './components/ProductComponent';
 
 const app = createApp(app);
@@ -830,9 +831,9 @@ export default {
 <!-- es: <teleport to="body"> </error-alert> -->
 <template>
   <div>
-    <teleport to="CSS_ID_SELECTOR">
+    <teleport to="ID_CSS_SELECTOR">      <!--   es: <teleport to="body">   -->
       <error-alert></error-alert>
-    </teleport>
+    </teleport> 
   </div>
 </template>
 ```
@@ -1440,59 +1441,6 @@ export default {
 <!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
 <!------------------------------------------------------------------------------------------------------------------>
 
-## Router
-
-
-- [Change url](#Change-url)
-- [Dynamic route that catches the next url destintion from the query params](#Dynamic-route-that-catches-the-next-url-destintion-from-the-query-params)
-- [Route guard (avoid the url access from the url bar for destination in witch is needed authentication)](#Route-guard-(avoid-the-url-access-from-the-url-bar-for-destination-in-witch-is-needed-authentication))
-
-#### Change url
-
-```javascript
-this.$router.replace("/xxx");
-```
-
-#### Dynamic route based on the presence of query paramas
-
-```javascript
-// http:/www.xxxxxxxxxx.com/yyyy?QUERY_PARAM=zzzzz
-const redirectUrl = "/" + this.$router.query.QUERY_PARAM;
-const redirectUrl = "/" + (this.$router.query.QUERY_PARAM || "otherPath");
-this.$router.replace(redirectUrl);
-```
-
-#### Route guard (avoid the url access from the url bar for destination in witch is needed authentication)
-
-```javascript
-// import store where is store if we are logged in
-import store from "./store/index.js";
-
-// add meta attribute
-const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    { path: "/register", component: CoachReg, meta: { requiresAuth: true } },
-    { path: "/auth", component: UserAuth, meta: { requiresUnauth: true } },
-  ],
-});
-
-// check if authentication is needed and if we are ogeed in
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !store.getters.isAuthenticated) {
-    next("/auth");
-  } else if (to.meta.requiresUnauth && store.getters.isAuthenticated) {
-    next("/coaches");
-  } else {
-    next();
-  }
-});
-```
-
-<!------------------------------------------------------------------------------------------------------------------>
-<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
-<!------------------------------------------------------------------------------------------------------------------>
-
 ## Instance options
 
 ```javascript
@@ -1723,6 +1671,172 @@ export default {
 ```
 </details>  
 
+
+<!------------------------------------------------------------------------------------------------------------------>
+<!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
+<!------------------------------------------------------------------------------------------------------------------>
+
+
+## Router
+- [Router options](#Router-options)
+- [Route options](#Route-options)
+- [Routing setup (register router)](#Routing-setup-(register-router))
+- [Rendering route (tag: router-view)](#Rendering-route-(tag:-router-view))
+- [Change url (tag: router-link)](#Change-url-(tag:-router-link))
+- [Styling active links](#Styling-active-links)
+- [Dynamic route that catches the next url destintion from the query params](#Dynamic-route-that-catches-the-next-url-destintion-from-the-query-params)
+- [Route guard (avoid the url access from the url bar for destination in witch is needed authentication)](#Route-guard-(avoid-the-url-access-from-the-url-bar-for-destination-in-witch-is-needed-authentication))
+
+
+#### Router options
+```js
+interface RouterConfig = {
+  routes: Array<RouteConfig>,
+  mode: string,
+  base: string,                 // base URL of the app
+  linkActiveClass: string,      // globally configure <router-link> default active class
+  linkExactActiveClass: string, // globally configure <router-link> default active class for exact matches
+  scrollBehavior: Function,     // i.e: preserve the scrolling position of history entries
+  parseQuery: Function,         // provide custom query string parse functions. Overrides the default
+  stringifyQuery: Function,     // provide custom query string stringify functions. Overrides the default
+  fallback: boolean             // controls whether the router should fallback to hash
+}
+```
+
+#### Route options
+```js
+interface RouteConfig = {
+  path: string,
+  [component]: Component,
+  [name]: string,                                   // for named routes
+  [components]: {                                   // for named views
+    [name: string]: Component
+  },      
+  [redirect]: string | Location | Function,
+  [props]: boolean | Object | Function,
+  [alias]: string | Array<string>,
+  [children]: Array<RouteConfig>,                   // for nested routes
+  [beforeEnter]: (
+    to: Route,
+    from: Route,
+    next: Function
+  ) => void,
+  [meta]: any,
+  [caseSensitive]: boolean,                         // use case sensitive match? (default: false)
+  [pathToRegexpOptions]: Object                     // path-to-regexp options for compiling regex
+}
+```
+
+#### Routing setup (register router)
+```js
+import App from './App.vue';
+import { createApp } from 'vue';
+import { createRouter, createWebHistory} from 'vue-router';
+
+import TeamsCustomComponent1 from './components/teams/TeamsCustomComponent1.vue';
+import TeamsCustomComponent2 from './components/teams/TeamsCustomComponent2.vue';
+import DialogsTeamCustomComponent2 from './components/dialogs/DialogsTeamCustomComponent2.vue';
+
+
+
+const router = createRouter({
+  history: createWebHistory(),   // how to manage the router history of the app
+  routes: [
+    { path: '/teams/team1', component: TeamsCustomComponent1 },
+    { path: '/teams/team2', component: TeamsCustomComponent2 },
+    { path: '/dialogs', component: DialogsTeamCustomComponent2 }
+  ]
+})
+
+const app = createApp(app);
+
+app.use(router);
+app.mount("#app");
+```
+
+#### Rendering route (tag: router-view)
+```vue
+<template>
+  <router-view></router-view>
+<template>
+```
+
+#### Change url (tag: router-link)
+```vue
+<template>
+  <nav>
+    <ul>
+      <li>
+        <router-link to="/teams/team1">Teams</router-link>
+      </li>
+      <li>
+        <router-link to="7dialogs">Dialogs</router-link>
+      </li>
+    </ul>
+  </nav>
+<template>
+```
+
+
+#### Styling active links
+```css
+a.active{
+
+}
+a.router-link-active{
+
+}
+a.router-link-exact-active{
+
+}
+```
+
+
+
+
+
+
+
+#### Change url
+```javascript
+this.$router.replace("/xxx");
+```
+
+#### Dynamic route based on the presence of query paramas
+
+```javascript
+// http:/www.xxxxxxxxxx.com/yyyy?QUERY_PARAM=zzzzz
+const redirectUrl = "/" + this.$router.query.QUERY_PARAM;
+const redirectUrl = "/" + (this.$router.query.QUERY_PARAM || "otherPath");
+this.$router.replace(redirectUrl);
+```
+
+#### Route guard (avoid the url access from the url bar for destination in witch is needed authentication)
+
+```javascript
+// import store where is store if we are logged in
+import store from "./store/index.js";
+
+// add meta attribute
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: "/register", component: CoachReg, meta: { requiresAuth: true } },
+    { path: "/auth", component: UserAuth, meta: { requiresUnauth: true } },
+  ],
+});
+
+// check if authentication is needed and if we are ogeed in
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !store.getters.isAuthenticated) {
+    next("/auth");
+  } else if (to.meta.requiresUnauth && store.getters.isAuthenticated) {
+    next("/coaches");
+  } else {
+    next();
+  }
+});
+```
 
 <!------------------------------------------------------------------------------------------------------------------>
 <!-----------------------------------------------> </br><hr></br> <!----------------------------------------------->
