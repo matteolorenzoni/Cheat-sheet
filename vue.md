@@ -1678,8 +1678,11 @@ export default {
 
 
 ## Router
-- [Router options](#Router-options)
-- [Route options](#Route-options)
+- [Route object](#Route-object)
+- [Route object options](#Route-object-options)
+- [Router object options](#Router-object-options)
+- [Router Instance Properties](#Router-Instance-Properties)
+- [Router Instance Methods](#Router-Instance-Methods)
 - [Routing setup (register router)](#Routing-setup-(register-router))
 - [Rendering route (tag: router-view)](#Rendering-route-(tag:-router-view))
 - [Change url (tag: router-link)](#Change-url-(tag:-router-link))
@@ -1687,10 +1690,47 @@ export default {
 - [Dynamic route that catches the next url destintion from the query params](#Dynamic-route-that-catches-the-next-url-destintion-from-the-query-params)
 - [Route guard (avoid the url access from the url bar for destination in witch is needed authentication)](#Route-guard-(avoid-the-url-access-from-the-url-bar-for-destination-in-witch-is-needed-authentication))
 
+#### Route object
+A route object represents the state of the current active route. </br>
+It contains parsed information of the current URL and the route records matched by the URL.
+The route object can be found in multiple places:
+- Inside components as this.$route
+- Inside $route watcher callbacks
+- Inside navigation guards as the first two arguments (to & from)
+```js
+var a = $route.path           // type: string
+var b = $route.fullPath       // type: string
+var c = $route.params         // type: object
+var d = $route.query          // type: object
+var e = $route.meta           // type: object
+var f = $route.hash           // type: string
+var g = $route.matched        // Array<RouteRecord>
+var h = $route.name           // type: string
+var i = $route.redirectedFrom // type: string
+```
 
-#### Router options
+#### Route object options
+```js
+interface RouteConfig = {
+  path: string,
+  component?: Component,
+  name?: string,                    // for named routes
+  components?: { name: Component }, 
+  redirect?: string | Location | Function,
+  props?: boolean | Object | Function,
+  alias?: string | Array<string>,
+  children?: Array<RouteConfig>, // for nested routes
+  beforeEnter?: (to: Route, from: Route, next: Function) => void,
+  meta?: any,
+  caseSensitive?: boolean, // use case sensitive match? (default: false)
+  pathToRegexpOptions?: Object // path-to-regexp options for compiling regex
+}
+```
+
+#### Router object options
 ```js
 interface RouterConfig = {
+  history: Function,            // how to manage the router history of the app
   routes: Array<RouteConfig>,
   mode: string,
   base: string,                 // base URL of the app
@@ -1703,28 +1743,107 @@ interface RouterConfig = {
 }
 ```
 
-#### Route options
+#### Router Instance Properties
 ```js
-interface RouteConfig = {
-  path: string,
-  [component]: Component,
-  [name]: string,                                   // for named routes
-  [components]: {                                   // for named views
-    [name: string]: Component
-  },      
-  [redirect]: string | Location | Function,
-  [props]: boolean | Object | Function,
-  [alias]: string | Array<string>,
-  [children]: Array<RouteConfig>,                   // for nested routes
-  [beforeEnter]: (
-    to: Route,
-    from: Route,
-    next: Function
-  ) => void,
-  [meta]: any,
-  [caseSensitive]: boolean,                         // use case sensitive match? (default: false)
-  [pathToRegexpOptions]: Object                     // path-to-regexp options for compiling regex
-}
+const router = createRouter({})
+
+var a = router.app              // type: Vue instance
+var b = router.mode             // type: string    -    the mode the router is using.
+var c = router.START_LOCATION   // type: Route     -    initial route location where the router starts at
+var a = router.app              // type: Vue instance
+```
+
+#### Router Instance Methods
+```js
+// guards
+router.beforeEach((to, from, next) => {})
+router.beforeResolve((to, from, next) => {})
+router.afterEach((to, from) => {})
+
+// Queues a callback to be called when the router has completed the initial navigation
+router.onReady(callback, [errorCallback])
+
+// Register a callback which will be called when an error is caught during a route navigation
+router.onError(callback)
+
+// programmatically navigation
+router.push(location, onComplete?, onAbort?)
+router.push(location)
+  .then(onComplete)
+  .catch(onAbort)
+router.replace(location, onComplete?, onAbort?)
+router.replace(location)
+  .then(onComplete)
+  .catch(onAbort)
+router.go(n)
+router.back()
+router.forward()
+
+// Array of the components matched by the provided location or the current route
+router.getMatchedComponents(location?)
+
+// Reverse URL resolving
+router.resolve(location, current?, append?)
+
+//Add a new route to the router
+router.addRoute(route: RouteConfig)
+
+// Get the list of all the active route records.
+router.getRoutes()
+```
+
+
+Global before guards (Navigation Guards)
+```js
+const router = createRouter({})
+
+router.beforeEach((to, from, next) => {})     
+```
+
+Global resolve guards (Navigation Guards)
+```js
+const router = createRouter({})
+
+router.beforeResolve((to, from, next) => {})
+```
+
+Only one route before guards (Navigation Guards)
+```js
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/foo',
+      component: Foo,
+      beforeEnter: (to, from, next) => {
+        // ...
+      }
+    }
+  ]
+})
+```
+
+Global after hooks
+```js
+const router = createRouter({})
+
+// No next() function and cannot affect the navigation
+router.afterEach((to, from) => {})
+```
+
+```js
+const router = createRouter({})
+
+router.push(location, onComplete?, onAbort?)
+router.push(location)
+  .then(onComplete)
+  .catch(onAbort)
+router.replace(location, onComplete?, onAbort?)
+router.replace(location)
+  .then(onComplete)
+  .catch(onAbort)
+router.go(n)
+router.back()
+router.forward()
 ```
 
 #### Routing setup (register router)
@@ -1740,7 +1859,7 @@ import DialogsTeamCustomComponent2 from './components/dialogs/DialogsTeamCustomC
 
 
 const router = createRouter({
-  history: createWebHistory(),   // how to manage the router history of the app
+  history: createWebHistory(),   
   routes: [
     { path: '/teams/team1', component: TeamsCustomComponent1 },
     { path: '/teams/team2', component: TeamsCustomComponent2 },
