@@ -558,6 +558,8 @@ export default {
 - [$refs](#$refs)
 - [$events](#$events)
 - [$emits()](#$emits())
+- [$router](#router)
+- [$route](#route)
 
 
 
@@ -1689,6 +1691,10 @@ export default {
 - [Rendering route (tag: router-view)](#Rendering-route-(tag:-router-view))
 - [Change url (tag: router-link)](#Change-url-(tag:-router-link))
 - [Styling active links](#Styling-active-links)
+- [Programmatic navigation](#Programmatic-navigation)
+- [Passing data with route params (Dynamic path segments)](#Passing-data-with-route-params-(Dynamic-path-segments))
+- [Problem: change data params remaining in the same component (updating params data with watchers)](#Problem:-change-data-params-remaining-in-the-same-component-(updating-params-data-with-watchers))
+
 - [Dynamic route that catches the next url destintion from the query params](#Dynamic-route-that-catches-the-next-url-destintion-from-the-query-params)
 - [Route guard (avoid the url access from the url bar for destination in witch is needed authentication)](#Route-guard-(avoid-the-url-access-from-the-url-bar-for-destination-in-witch-is-needed-authentication))
 
@@ -1696,14 +1702,14 @@ export default {
 #### Full navigation resolution flow
 - Navigation triggered
 - Call *beforeRouteLeave* guards in deactivated components
-- Call global *beforeEach* guards
+- Call *beforeEach* global guards
 - Call *beforeRouteUpdate* guards in reused components
 - Call *beforeEnter* in route configs
 - Resolve async route components
 - Call *beforeRouteEnter* in activated components
-- Call global *beforeResolve* guards
+- Call *beforeResolve* global guards
 - **Navigation confirmed**
-- Call global afterEach hooks
+- Call *afterEach* global hooks
 - DOM updates triggered
 - Call callbacks passed to *next* in *beforeRouteEnter* guards with instantiated instances
 
@@ -1845,7 +1851,9 @@ router.getRoutes()
   export default {
     // NOT have access to `this` directly, only in callback passed to next()
     beforeRouteEnter(to, from, next) {
-      next(vm => { /* access to component instance via `vm` */ })
+      next(vm => {
+        /* access to component instance via `vm` */ 
+      })
     }
 
     // have access to `this`
@@ -1986,10 +1994,53 @@ a.router-link-exact-active{
 ```
 
 
+#### Programmatic navigation
+```js
+import TeamMember from './components/teams/TeamMember.vue';
+
+/* THE IMPORTANCE OF THE ORDER */
+const router = createRouter({
+  history: createWebHistory(),   
+  routes: [
+    { path: '/teams/:teamId', component: TeamMember },
+    { path: '/teams/new', component: TeamsCustomComponent1 }    
+  ]
+})
+```
 
 
+#### Passing data with route params (Dynamic path segments)
+```js
+var a = $route.path     
+var b = $route.fullPath 
+var c = $route.params   
+var d = $route.query    
+```
 
+#### Problem: change data params remaining in the same component (updating params data with watchers)
+- When change the url and stay on the same component, the data don't change
+- The view router doesn't destroy and recreate the component just because the url changes
+- Solution: updating params data with watchers)
+```vue
+<script>
+  export default {
+    methods: {
+      updateData(route){
+        const dataValue = route.params.teamId;
+      }
+    }
+    watch: {
+      $route(newRoute, _){
+        updateData(newRoute);
+      }
+    },
+    created(){
+      this.updateData(this.$route);
+    }
+  };
+</script>
 
+```
 
 #### Change url
 ```javascript
@@ -2326,7 +2377,7 @@ export default {
     },
   },
 };
-</script>
+</>
 
 //-----------------------------------------------------------------
 
